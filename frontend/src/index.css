@@ -5,3 +5,21 @@
 }
 
 @import "tailwindcss";
+
+@theme{
+  --color-bg1:#003F62;
+  --color-bg2:#EDA415;
+  --color-bg3:#E2F4FF;
+  --color-cl1:#2C6586;
+  --color-cl2:#2E8FC5;
+}
+
+@layer components {
+  .btnnav{
+    @apply border border-bg2 p-2 rounded-full transform hover:bg-bg2 text-white font-bold transition-all duration-200 hover:scale-105;
+  }
+  .sm1{
+    @apply sm:text-center absolute right-10 top-1/2 
+  }
+}
+

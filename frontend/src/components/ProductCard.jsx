@@ -1,77 +1,69 @@
-
-
-
-
-
-// export default function ProductCard({product}) {
-//   return (
-//     <div className="group overflow-hidden rounded-xl border border-gray-200  bg-white shadow-sm transition hover:shadow-md">
-//        <div className="h-64 overflow-hidden bg-gray-100">
-//            <img 
-//            src={product.image} 
-//            alt={product.name}
-//             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-//            />
-//        </div>
-//     </div>
-//   )
-// }
-
+import { ShoppingCart, Star } from "lucide-react";
 
 export default function ProductCard({ product }) {
     return (
-        <div className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
+        <div className="group relative overflow-hidden rounded-lg bg-white transition duration-300 hover:shadow-lg shadow-md">
+            <div className="relative flex h-64 items-center justify-center overflow-hidden">
 
-            {/* Product image */}
-            <div className="h-64 overflow-hidden bg-gray-100">
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    className="h-full w-full object-contain p-6 transition duration-300 group-hover:scale-105"
                 />
-            </div>
 
-            {/* Product information */}
+            </div>
             <div className="p-4">
 
-                <h2 className="text-lg font-semibold text-gray-900">
-                    {product.name}
-                </h2>
-
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mb-1 text-xs text-gray-400">
                     {product.category}
                 </p>
 
-                <div className="mt-3 flex items-center justify-between">
+                <h3 className="line-clamp-1 text-sm font-semibold text-[#005078]">
+                    {product.name}
+                </h3>
+                <div className="mt-2 flex items-center gap-1">
 
-                    <span className="text-lg font-bold text-gray-900">
-                        ${product.price}
-                    </span>
+                    <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                                key={star}
+                                size={14}
+                                className={
+                                    star <= product.rating
+                                        ? "fill-[#f5a800] text-[#f5a800]"
+                                        : "text-gray-300"
+                                }
+                            />
+                        ))}
+                    </div>
 
-                    <span className="text-sm text-yellow-500">
-                        ⭐ {product.rating}
+                    <span className="ml-1 text-xs text-gray-400">
+                        ({product.rating})
                     </span>
 
                 </div>
 
-                {/* Availability */}
-                <p className="mt-2 text-sm">
-                    {product.stock > 0 ? (
-                        <span className="text-green-600">
-                            In stock
-                        </span>
-                    ) : (
-                        <span className="text-red-600">
-                            Out of stock
-                        </span>
-                    )}
-                </p>
+                <div className="mt-3">
+                    <span className="text-lg font-bold text-[#005078]">
+                        ${product.price.toFixed(2)}
+                    </span>
+                </div>
+                <div className="mt-4 flex gap-2">
 
-                <button
-                    className="mt-4 w-full rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
-                    View Details
-                </button>
+                    <button
+                        className="flex flex-1 items-center justify-center gap-2 rounded-md bg-[#f5a800] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#d99000]"
+                    >
+                        <ShoppingCart size={15} />
+                        Add to Cart
+                    </button>
+
+                    {/* <button
+                        className="flex h-9 w-10 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:border-[#005078] hover:text-[#005078]"
+                    >
+                        <Eye size={17} />
+                    </button> */}
+
+                </div>
 
             </div>
         </div>
