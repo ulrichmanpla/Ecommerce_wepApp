@@ -25,8 +25,10 @@ export default function BrandStrip() {
     ]
   return (
     <>
-     <div>
-   dddd
+     <div className='flex justify-between bg-bg3 items-center p-4 mx-4 rounded-2xl'>
+        {
+            brands.map((img)=> <div key={img.id} ><img src={img.image} alt="" width={150} /></div>)
+        }
      </div>
     </>
   )

@@ -9,6 +9,8 @@ import FeaturedProducts from "./FeatureProduct"
 import PeopleTestimonials from "./PeopleTestimonials"
 import Testimonials from "./Testimonials"
 import BrandStrip from "./BrandStrip"
+import LatestNews from "./LatestNews"
+import Footer from "./Footer"
 export default function Home() {
      
   return (
@@ -21,6 +23,8 @@ export default function Home() {
      <Testimonials/>
      <PeopleTestimonials/>
      <BrandStrip/>
-    </>
-  )
+     <LatestNews/>
+     <Footer/>
+ </>
+ )
 }

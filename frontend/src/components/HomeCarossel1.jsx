@@ -32,7 +32,7 @@ export default function Hero() {
     const slide = slides[currentSlide];
 
     return (
-        <section className="mx-auto max-w-7xl px-4 py-8">
+        <section className="mx-auto max-w-7xl px-4 py-8 mt-6 ">
 
             <div className="relative flex min-h-82.5 items-center overflow-hidden rounded-2xl px-8 md:px-14">
 
