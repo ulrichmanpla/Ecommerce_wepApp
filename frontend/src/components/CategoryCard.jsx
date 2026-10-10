@@ -18,7 +18,7 @@ export default function CategoryCard({ category }) {
                 </h3>
 
                 <p className="mt-1 text-xs text-gray-500">
-                    ({category.items} items)
+                    ({category.stock} items)
                 </p>
             </div>
 

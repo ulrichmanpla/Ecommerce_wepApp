@@ -2,9 +2,12 @@
 const Product = require("../models/products")
 const uploadToCloudinary = require("../utils/cloudinaryUpload")
 const createProduct = async (req, res)=>{
+     console.log("requrest content type: ",req.headers["content-type"])
+     console.log("request body: ", req.body)
+     console.log("uploaded file:",req.file)
     try{
-        const {name, price, category, stock} = req.body
-        if(!name || !price || !category || stock === undefined){
+        const {name, price, category, stock, rating} = req.body
+        if(!name || price === undefined || !category || stock === undefined){
             return res.status(400).json({
                 message:"Please provide name, price, category and stock"
             })
@@ -23,6 +26,7 @@ const createProduct = async (req, res)=>{
         price: Number(price),
         category,
         stock: Number(stock),
+        rating:Number(rating),
         image: uploadResult.secure_url
       })
       res.status(201).json(product)
@@ -32,18 +36,6 @@ const createProduct = async (req, res)=>{
         })
     }
 }
-
-// const getProducts = async(req,res)=>{
-//   try{
-//     const products = await Product.find()
-
-//     res.status(200).json(products)
-//   }catch(err){
-//     res.status(500).json({
-//         message: err.message
-//     })
-//   }  
-// }
 
 const getProducts = async (req,res)=>{
     try{

@@ -17,7 +17,7 @@ connectDB()
 
 app.use(cors())
 app.use(express.json())
-
+app.use(express.urlencoded({extended: true}))
 app.use("/products", ProductRoutes)
 app.use("/auth", UserRoutes)
 app.use("/cart",cartRoutes)

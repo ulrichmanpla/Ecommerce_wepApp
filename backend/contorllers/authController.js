@@ -76,7 +76,21 @@ const login = async (req,res)=>{
         })
     }
 }
+
+const getUser = async(req,res)=>{
+    const id = req.user.userId
+    const users = await User.findOne({_id: id})
+    res.status(200).json({
+        message:"successfully get user",
+        user:{
+            name: users.name,
+            email: users.email,
+            role: users.role
+        }
+    })
+}
 module.exports = {
     registerUser,
-    login
+    login,
+    getUser
 }

@@ -1,28 +1,60 @@
-import { useState } from "react";
-import popularProducts from "../data/PopularProduct.js";
+import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
-
+import api from '../services/api.js'
 export default function PopularProducts() {
-
+      const [products, setProducts]= useState([])
+      const [loading, setLoading]= useState(true)
+      const [error, setError]=useState(null)
     const [activeCategory, setActiveCategory] = useState("All");
 
-    const categories = [
-        "All",
-        "Cameras",
-        "Laptops",
-        "Tablets",
-        "Mouse"
-    ];
-
-    const filteredProducts =
+     useEffect(()=>{
+         async function getProducts() {
+            try{
+                setLoading(true)
+                setError(null)
+                const response = await api.get("/products")
+                setProducts(response.data)
+            }catch(error){
+                console.log("popularProduct error",error.message)
+              setError(error.message || "Failed to upload")  
+            }finally{
+                setLoading(false)
+            }
+         }
+         getProducts()
+        },[])
+        if(loading){
+            return (
+                <section className="font-bold">Product loadding....</section>
+            )
+        }
+        if(error){
+            return (
+                 <section className="mx-auto max-w-7xl px-4 py-12 flex justify-center items-center">
+                <div>
+                    <p className="text-red-600 text-sm mb-3">{error} </p>
+                    <button className="px-4 py-2 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition" onClick={()=> window.location.reload()}>Retry again </button>
+                </div>
+                </section>
+            )
+        }
+        const categories = [
+            "All",
+            "Cameras",
+            "Laptop",
+            "Consoles",
+            "Tablet",
+            "Mouse"
+        ];
+        const product = products.slice(0,12)
+        const filteredProducts =
         activeCategory === "All"
-            ? popularProducts
-            : popularProducts.filter(
-                (product) =>
-                    product.category.toLowerCase() ===
-                    activeCategory.toLowerCase()
-            );
-
+        ? product
+        : product.filter(
+            (product) =>
+                product.category.toLowerCase() ===
+            activeCategory.toLowerCase()
+        );   
     return (
         <section className="mx-auto max-w-7xl px-4 py-10">
 
@@ -32,7 +64,7 @@ export default function PopularProducts() {
                     Popular products
                 </h2>
 
-                <div className="flex gap-2 overflow-x-auto">
+                <div className="flex gap-2 overflow-x-auto ">
 
                     {categories.map((category) => (
                         <button
@@ -56,7 +88,7 @@ export default function PopularProducts() {
 
                 {filteredProducts.map((product) => (
                     <ProductCard
-                        key={product.id}
+                        key={product._id}
                         product={product}
                     />
                 ))}

@@ -6,10 +6,10 @@ const adminOnly = require("../middleware/adminMiddleware")
 const upload = require("../middleware/uploadMiddleware")
 const { createProduct, getProducts,getProduct,updateProduct,deleteProduct} = require("../contorllers/productController")
 
-router.post('/',authmiddleware,upload.single("image"),createProduct)
+router.post('/',upload.single("image"),createProduct)
 router.get('/',getProducts)
 router.get('/:id',getProduct)
 router.put('/:id',authmiddleware,updateProduct)
-router.delete('/:id',authmiddleware,adminOnly,deleteProduct)
+router.delete('/:id',deleteProduct)
 
 module.exports = router

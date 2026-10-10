@@ -1,42 +1,18 @@
-import { useRef } from "react";
+import { useRef, useEffect,useState } from "react";
 import CategoryCard from "./CategoryCard";
 
-import speakerImage from "../assets/81.png";
-import laptopImage from "../assets/51.png";
-import cameraImage from "../assets/Frame2.png";
-
+import api from '../services/api'
 export default function CategorySection() {
-
+     const [products, setProducts]=useState([])
     const carouselRef = useRef(null);
-
-    const categories = [
-        {
-            name: "Speaker",
-            items: 6,
-            image: speakerImage
-        },
-        {
-            name: "Desktop & laptop",
-            items: 6,
-            image: laptopImage
-        },
-        {
-            name: "DSLR camera",
-            items: 6,
-            image: cameraImage
-        },
-        {
-            name: "Wireless headphones",
-            items: 6,
-            image: speakerImage
-        },
-        {
-            name: "Game controller",
-            items: 6,
-            image: cameraImage
-        }
-    ];
-
+    useEffect(()=>{
+      async function getProducts() {
+        const response = await api.get("/products")
+        setProducts(response.data)
+      }
+      getProducts()
+    },[])
+    console.log("this is the category",products)
     const scrollLeft = () => {
         carouselRef.current.scrollBy({
             left: -300,
@@ -52,7 +28,7 @@ export default function CategorySection() {
     };
 
     return (
-        <section className="mx-auto max-w-7xl px-10  py-4 ">
+        <section className="mx-auto max-w-7xl px-4  py-4 ">
 
             <div className="relative">
 
@@ -67,12 +43,12 @@ export default function CategorySection() {
 
                 <div
                     ref={carouselRef}
-                    className="flex justify-center  gap-4 overflow-x-auto scroll-smooth px-2 scrollbar-hide"
+                    className="flex justify-start  gap-4 overflow-x-auto scroll-smooth px-2 scroll-hide"
                 >
 
-                    {categories.map((category) => (
+                    {products.map((category) => (
                         <CategoryCard
-                            key={category.name}
+                            key={category._id}
                             category={category}
                         />
                     ))}

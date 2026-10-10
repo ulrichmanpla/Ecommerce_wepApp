@@ -68,34 +68,55 @@ const addToCart = async (req, res)=>{
     }
 }
 
-const getCart = async (req,res)=>{
-    try{
-       const cart = await Cart.findOne({
-        user:req.user.userId
-       }).populate("items.product")
-       if(!cart){
-        return res.status(200).json({
-            items:[],
-            subtotal:0,
-            total:0
-        })
-       }
-       let subtotal = 0 
-       cart.items.forEach(item => {
-         subtotal += item.product.price * item.quantity
-       })
 
-       res.status(200).json({
-        cart,
-        subtotal,
-        total: subtotal
-       })
-    }catch(err){
+
+const getCart = async (req, res) => {
+    try {
+        const cart = await Cart.findOne({
+            user: req.user.userId
+        }).populate("items.product");
+
+        if (!cart) {
+            return res.status(200).json({
+                items: [],
+                subtotal: 0,
+                total: 0
+            });
+        }
+
+        let subtotal = 0;
+        
+        // 1. Filtrer les articles pour ne garder que ceux dont le produit existe encore
+        const validItems = cart.items.filter(item => item.product !== null);
+
+        // 2. Calculer le sous-total uniquement sur les articles valides
+        validItems.forEach(item => {
+            subtotal += item.product.price * item.quantity;
+        });
+
+        // 3. Optionnel : Mettre à jour le panier en BDD pour supprimer définitivement les articles fantômes
+        if (validItems.length !== cart.items.length) {
+            cart.items = validItems;
+            await cart.save();
+        }
+
+        res.status(200).json({
+            // On renvoie le panier mis à jour ou converti en objet avec les items valides
+            cart: {
+                ...cart.toObject(),
+                items: validItems
+            },
+            subtotal,
+            total: subtotal
+        });
+
+    } catch (err) {
         res.status(500).json({
-            message:err.message
-        })
+            message: err.message
+        });
     }
-}
+};
+
 
 const updateCartItem = async (req,res)=>{
     try{

@@ -1,0 +1,185 @@
+
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingBag, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import api from "../services/api";
+
+export default function Register() {
+    const navigate = useNavigate();
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        try {
+            await api.post("/auth/register", form);
+            navigate("/login", {
+                state: { message: "Account created successfully. Please log in." },
+            });
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "Unable to create your account. Please try again."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-[#E0F3FC] px-4 py-10">
+            <div className="mx-auto grid min-h-162.5 max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl md:grid-cols-2">
+
+                {/* Left design panel */}
+                <div className="relative flex flex-col justify-between overflow-hidden bg-[#005078] p-8 text-white md:p-12">
+                    <Link to="/" className="flex items-center gap-2 text-2xl font-extrabold">
+                        <ShoppingBag className="text-[#F5A800]" size={28} />
+                        Electon
+                    </Link>
+
+                    <div className="relative z-10 py-10">
+                        <p className="mb-3 text-sm font-semibold uppercase tracking-[3px] text-[#F5A800]">
+                            Welcome to Electon
+                        </p>
+                        <h1 className="text-4xl font-bold leading-tight md:text-5xl">
+                            Everything you need,
+                            <span className="text-[#F5A800]"> in one place.</span>
+                        </h1>
+                        <p className="mt-5 max-w-sm text-sm leading-6 text-blue-100">
+                            Create your account to discover electronics,
+                            explore new products, and enjoy a simpler shopping experience.
+                        </p>
+                    </div>
+
+                    <div className="absolute -bottom-20 -right-16 h-64 w-64 rounded-full border-35 border-white/5" />
+                    <div className="absolute right-12 top-24 h-28 w-28 rounded-full bg-[#F5A800]/10" />
+
+                    <p className="relative text-xs text-blue-100">
+                        Your next favorite product is waiting.
+                    </p>
+                </div>
+
+                {/* Registration form */}
+                <div className="flex items-center justify-center p-6 md:p-12">
+                    <div className="w-full max-w-md">
+                        <h2 className="text-3xl font-bold text-[#005078]">
+                            Create account
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-500">
+                            Fill in your details to get started.
+                        </p>
+
+                        {error && (
+                            <p role="alert" className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                                {error}
+                            </p>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-[#005078]">
+                                    Full name
+                                </label>
+                                <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-4 focus-within:border-[#005078]">
+                                    <User size={18} className="text-gray-400" />
+                                    <input
+                                        name="name"
+                                        value={form.name}
+                                        onChange={handleChange}
+                                        placeholder="Enter your full name"
+                                        required
+                                        autoComplete="name"
+                                        className="w-full py-3 text-sm outline-none"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-[#005078]">
+                                    Email address
+                                </label>
+                                <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-4 focus-within:border-[#005078]">
+                                    <Mail size={18} className="text-gray-400" />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        placeholder="you@example.com"
+                                        required
+                                        autoComplete="email"
+                                        className="w-full py-3 text-sm outline-none"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-[#005078]">
+                                    Password
+                                </label>
+                                <div className="flex items-center gap-3 rounded-lg border border-gray-200 px-4 focus-within:border-[#005078]">
+                                    <Lock size={18} className="text-gray-400" />
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        placeholder="Create a password"
+                                        required
+                                        minLength={6}
+                                        autoComplete="new-password"
+                                        className="w-full py-3 text-sm outline-none"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                        className="text-gray-400 hover:text-[#005078]"
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                                <p className="mt-2 text-xs text-gray-400">
+                                    Use at least 6 characters.
+                                </p>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full rounded-lg bg-[#F5A800] py-3.5 text-sm font-bold text-white transition hover:bg-[#d99000] disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {loading ? "Creating account..." : "Create account"}
+                            </button>
+                        </form>
+
+                        <p className="mt-6 text-center text-sm text-gray-500">
+                            Already have an account?{" "}
+                            <Link to="/login" className="font-bold text-[#005078] hover:text-[#F5A800]">
+                                Sign in
+                            </Link>
+                        </p>
+
+                        <Link to="/" className="mt-5 block text-center text-xs text-gray-400 hover:text-[#005078]">
+                            ← Back to home
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
