@@ -2,7 +2,7 @@ import logo1 from '../assets/logo1.png'
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {getCart} from '../services/cartService'
-import {getuser} from '../services/user'
+import {getUser} from '../services/user'
 import { useNavigate } from 'react-router-dom';
 export default function Navbar() {
     const navigate = useNavigate()
@@ -18,12 +18,11 @@ export default function Navbar() {
  },[])
   useEffect(()=>{
     async function getUsers() {
-        const data  = await getuser()
+        const data  = await getUser()
         setUserInfo(data)
     }
      getUsers()
  },[])
- console.log("ths is the user info",userinfo)
 
  const cartquantity = cartItems?.cart?.items.length
    const handlelogout = ()=>{
@@ -37,31 +36,16 @@ export default function Navbar() {
 
                 <div className="mx-auto flex max-w-7xl items-center justify-between gap-5">
 
-                    {/* Logo */}
+         
                     <div className="text-xl font-bold text-white">
                        <img src={logo1} alt="logo1" />  
                     </div>
 
 
-                    {/* Search */}
-                    <div className="hidden max-w-xl flex-1 md:flex ring-1 ring-amber-500 rounded-full text-white">
-
-                        <input
-                            type="text"
-                            placeholder="Search any things"
-                            className="w-full rounded-l-full px-5 py-3 text-sm text-white"
-                        />
-
-                        <button className="rounded-r-full bg-[#f5a800] px-7 text-sm font-medium text-white">
-                            Search
-                        </button>
-
-                    </div>
-
-
-                    {/* Actions */}
                     <div className="flex items-center gap-4 text-sm text-white">
-
+                        <Link to='/' className='font-bold hover:text-bg2'>Home</Link>
+                        <Link to='/products' className='font-bold hover:text-bg2'>Products</Link>
+                        <Link to='/orders' className='font-bold hover:text-bg2' >Orders</Link>
                         <Link to='/register' className="btnnav">
                              Sign in
                         </Link>
@@ -84,8 +68,8 @@ export default function Navbar() {
             </div>
             
             { isopen &&  <div className='bg-bg1 text-white w-fit p-3 absolute right-0 rounded-2xl'>
-                 <h3>name</h3>
-                 <h4>email</h4>
+                 <h3>{!userinfo ? "name" : `${userinfo.user.name}`}</h3>
+                 <h4>{!userinfo ? "email" :  `${userinfo.user.email}`}</h4>
                  <div onClick={()=>{handlelogout();
                     setOpen((prev)=> !prev)}} className='text-red-500 cursor-pointer'>Logout</div>
               </div>

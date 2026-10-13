@@ -22,3 +22,8 @@ export const updateCartItem = async (productId, quantity)=>{
     })
    return response.data
 }
+
+export const deleteCartItem = async (id)=>{
+    const response = await api.delete(`/cart/${id}`)
+    return response.data
+}
