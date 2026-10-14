@@ -9,6 +9,8 @@ import ProductDetails from './pages/ProductDetails'
 import Cart from "./pages/Cart"
 import Products from './pages/Products'
 import Orders from "./pages/Orders"
+import AdminDashboard from "./pages/admin/AdminDashboard"
+import { Ad } from "lucide-react"
 export default function App() {
   return (
     <>
@@ -22,6 +24,7 @@ export default function App() {
             <Route path="/cart" element={<Cart/>}/>
             <Route path="/products" element={<Products/>}/>
             <Route path="/orders" element={<Orders/>}/>
+            <Route path="/admin" element={<AdminDashboard/>}/>
             
         </Routes>
      </BrowserRouter>

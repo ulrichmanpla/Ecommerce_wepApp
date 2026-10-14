@@ -9,7 +9,7 @@ const { createProduct, getProducts,getProduct,updateProduct,deleteProduct} = req
 router.post('/',upload.single("image"),createProduct)
 router.get('/',getProducts)
 router.get('/:id',getProduct)
-router.put('/:id',authmiddleware,updateProduct)
+router.put('/:id',upload.single("image"),updateProduct)
 router.delete('/:id',deleteProduct)
 
 module.exports = router

@@ -87,30 +87,54 @@ const getProduct = async(req, res)=>{
     }
 }
 
-const updateProduct = async (req, res)=>{
-    try{
-       const product = await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-            new: true,
-            runValidators: true
-        }
-       )
-       if(!product){
-        return res.status(404).json({
-            message:"Product not found"
-        })
-       }
+const updateProduct = async (req, res) => {
+  try {
+    const updates = { ...req.body };
 
-    res.status(200).json(product)
-    }catch(err){
-        res.status(500).json({
-            message: err.message
-        })
+    // Convert numeric fields received through FormData.
+    if (updates.price !== undefined) {
+      updates.price = Number(updates.price);
     }
-}
 
+    if (updates.stock !== undefined) {
+      updates.stock = Number(updates.stock);
+    }
+
+    if (updates.rating !== undefined) {
+      updates.rating = Number(updates.rating);
+    }
+
+    // Upload a new image only if the admin selected one.
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer);
+      updates.image = uploadResult.secure_url;
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { $set: updates },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Product updated successfully",
+      product,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
 const deleteProduct = async(req, res)=>{
     try{
         const product = await Product.findByIdAndDelete(

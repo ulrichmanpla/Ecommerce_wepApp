@@ -15,156 +15,23 @@ import {
 import { getOrders } from "../services/orderService";
 import Footer from "../components/Footer";
 
-const formatPrice = (amount) =>
-  new Intl.NumberFormat("en-CM", {
-    style: "currency",
-    currency: "XAF",
-    maximumFractionDigits: 0,
-  }).format(Number(amount) || 0);
-
-const getOrderId = (order) =>
-  order?._id || order?.id || order?.orderId || "N/A";
-
-const getOrderItems = (order) =>
-  order?.items || order?.products || [];
-
-const getProduct = (item) =>
-  item?.product || item?.productId || item;
-
-const getProductId = (item) => {
-  const product = getProduct(item);
-
-  if (typeof product === "string") return product;
-
-  return product?._id || product?.id || null;
-};
-
-const getProductName = (item) => {
-  const product = getProduct(item);
-
-  return (
-    (typeof product === "object" ? product?.name : null) ||
-    item?.productName ||
-    item?.name ||
-    "Product"
-  );
-};
-
-const getProductImage = (item) => {
-  const product = getProduct(item);
-
-  return (
-    (typeof product === "object" ? product?.image : null) ||
-    item?.image ||
-    ""
-  );
-};
-
-const getQuantity = (item) =>
-  Number(item?.quantity) || 1;
-
-const getItemPrice = (item) => {
-  const product = getProduct(item);
-
-  return Number(
-    item?.price ??
-      item?.unitPrice ??
-      (typeof product === "object" ? product?.price : null) ??
-      0
-  );
-};
-
-const getOrderTotal = (order) =>
-  Number(
-    order?.totalAmount ??
-      order?.totalPrice ??
-      order?.total ??
-      order?.grandTotal ??
-      0
-  );
-
-const getOrderDate = (order) => {
-  const date = order?.createdAt || order?.orderDate || order?.date;
-
-  if (!date) return "Date unavailable";
-
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "Date unavailable";
-  }
-
-  return parsedDate.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-};
-
-const getStatusStyle = (status) => {
-  const normalized = String(status || "pending").toLowerCase();
-
-  if (["delivered", "completed", "paid"].includes(normalized)) {
-    return {
-      label: normalized,
-      className: "bg-green-100 text-green-700",
-      Icon: CircleCheck,
-    };
-  }
-
-  if (["cancelled", "canceled", "failed"].includes(normalized)) {
-    return {
-      label: normalized,
-      className: "bg-red-100 text-red-700",
-      Icon: XCircle,
-    };
-  }
-
-  if (normalized === "shipped") {
-    return {
-      label: normalized,
-      className: "bg-blue-100 text-blue-700",
-      Icon: Package,
-    };
-  }
-
-  return {
-    label: normalized,
-    className: "bg-amber-100 text-amber-800",
-    Icon: Clock,
-  };
-};
-
-// Extract orders from the actual backend response.
-const extractOrders = (response) => {
-  // Supports either an Axios response or response.data from Axios.
-  const body = response?.data ?? response;
-
-  // Your backend returns { message, order: [...] }.
-  if (Array.isArray(body?.order)) return body.order;
-
-  // Also supports { orders: [...] } or a direct array.
-  if (Array.isArray(body?.orders)) return body.orders;
-  if (Array.isArray(body)) return body;
-
-  return [];
-};
-
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Orders come exclusively from the backend.
+  // Fetch orders from the backend
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
 
       const response = await getOrders();
-      const orderList = extractOrders(response);
+      const data = response?.data ?? response;
 
-      setOrders(orderList);
+      const orderList = data?.order ?? data?.orders ?? [];
+
+      setOrders(Array.isArray(orderList) ? orderList : []);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -179,11 +46,47 @@ export default function Orders() {
     fetchOrders();
   }, [fetchOrders]);
 
+  // Get the correct status icon and color
+  const getStatusStyle = (status) => {
+    const value = String(status || "pending").toLowerCase();
+
+    if (["delivered", "completed", "paid"].includes(value)) {
+      return {
+        label: value,
+        className: "bg-green-100 text-green-700",
+        Icon: CircleCheck,
+      };
+    }
+
+    if (["cancelled", "canceled", "failed"].includes(value)) {
+      return {
+        label: value,
+        className: "bg-red-100 text-red-700",
+        Icon: XCircle,
+      };
+    }
+
+    if (value === "shipped") {
+      return {
+        label: value,
+        className: "bg-blue-100 text-blue-700",
+        Icon: Package,
+      };
+    }
+
+    return {
+      label: value,
+      className: "bg-amber-100 text-amber-800",
+      Icon: Clock,
+    };
+  };
+
   return (
     <>
       <main className="min-h-screen bg-gray-50 px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          {/* Page heading */}
+
+          {/* PAGE HEADING */}
           <div className="mb-8">
             <div className="mb-3 flex items-center gap-2 text-sm text-gray-500">
               <Link to="/" className="transition hover:text-[#005078]">
@@ -220,7 +123,7 @@ export default function Orders() {
             </div>
           </div>
 
-          {/* Loading state */}
+          {/* LOADING STATE */}
           {loading && (
             <div className="rounded-2xl bg-white p-12 text-center shadow-sm">
               <RefreshCw
@@ -231,7 +134,7 @@ export default function Orders() {
             </div>
           )}
 
-          {/* Error state */}
+          {/* ERROR STATE */}
           {!loading && error && (
             <div className="rounded-xl border border-red-200 bg-red-50 p-5">
               <p className="font-medium text-red-700">{error}</p>
@@ -245,7 +148,7 @@ export default function Orders() {
             </div>
           )}
 
-          {/* Empty state: based only on the backend response */}
+          {/* EMPTY STATE */}
           {!loading && !error && orders.length === 0 && (
             <div className="rounded-2xl bg-white px-6 py-16 text-center shadow-sm">
               <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#E0F3FC]">
@@ -270,21 +173,22 @@ export default function Orders() {
             </div>
           )}
 
-          {/* Orders retrieved from the backend */}
+          {/* ORDERS LIST */}
           {!loading && !error && orders.length > 0 && (
             <div className="space-y-6">
               {orders.map((order, index) => {
-                const items = getOrderItems(order);
+                const orderId = order._id || order.id || order.orderId || "N/A";
+                const items = order.items || order.products || [];
                 const status = getStatusStyle(order.status);
-                const orderId = getOrderId(order);
+                const StatusIcon = status.Icon;
 
                 return (
                   <article
                     key={orderId === "N/A" ? `order-${index}` : orderId}
                     className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm"
                   >
-                    {/* Order header */}
-                    <div className="flex flex-col justify-between gap-4 border-b border-gray-100 bg-white p-5 sm:flex-row sm:items-center sm:px-6">
+                    {/* ORDER HEADER */}
+                    <div className="flex flex-col justify-between gap-4 border-b border-gray-100 p-5 sm:flex-row sm:items-center sm:px-6">
                       <div className="flex flex-wrap gap-x-8 gap-y-4">
                         <div>
                           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
@@ -301,7 +205,17 @@ export default function Orders() {
                             Order date
                           </p>
                           <p className="mt-1 font-medium text-gray-700">
-                            {getOrderDate(order)}
+                            {order.createdAt &&
+                            !Number.isNaN(new Date(order.createdAt).getTime())
+                              ? new Date(order.createdAt).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )
+                              : "Date unavailable"}
                           </p>
                         </div>
                       </div>
@@ -309,13 +223,13 @@ export default function Orders() {
                       <span
                         className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold ${status.className}`}
                       >
-                        <status.Icon size={15} />
+                        <StatusIcon size={15} />
                         {status.label.charAt(0).toUpperCase() +
                           status.label.slice(1)}
                       </span>
                     </div>
 
-                    {/* Order items */}
+                    {/* PRODUCTS */}
                     <div className="divide-y divide-gray-100 px-5 sm:px-6">
                       {items.length === 0 && (
                         <p className="py-6 text-sm text-gray-500">
@@ -324,26 +238,47 @@ export default function Orders() {
                       )}
 
                       {items.map((item, itemIndex) => {
-                        const image = getProductImage(item);
-                        const productId = getProductId(item);
-                        const quantity = getQuantity(item);
-                        const price = getItemPrice(item);
-                        const productName = getProductName(item);
+                        const product =
+                          item.product || item.productId || item;
+
+                        const productId =
+                          typeof product === "string"
+                            ? product
+                            : product?._id || product?.id;
+
+                        const productName =
+                          (typeof product === "object" ? product?.name : null) ||
+                          item.productName ||
+                          item.name ||
+                          "Product";
+
+                        const image =
+                          (typeof product === "object" ? product?.image : null) ||
+                          item.image ||
+                          "";
+
+                        const quantity = Number(item.quantity) || 1;
+
+                        const price = Number(
+                          item.price ??
+                            item.unitPrice ??
+                            (typeof product === "object"
+                              ? product?.price
+                              : null) ??
+                            0
+                        );
 
                         return (
                           <div
-                            key={item?._id || productId || itemIndex}
+                            key={item._id || productId || itemIndex}
                             className="flex items-center gap-4 py-5"
                           >
-                            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#E0F3FC]">
+                            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl">
                               {image ? (
                                 <img
                                   src={image}
                                   alt={productName}
                                   className="h-full w-full object-contain p-2"
-                                  onError={(event) => {
-                                    event.currentTarget.style.display = "none";
-                                  }}
                                 />
                               ) : (
                                 <Package
@@ -372,23 +307,33 @@ export default function Orders() {
                               </p>
 
                               <p className="mt-1 text-sm font-medium text-[#005078]">
-                                {formatPrice(price)} each
+                                {new Intl.NumberFormat("en-CM", {
+                                  style: "currency",
+                                  currency: "XAF",
+                                  maximumFractionDigits: 0,
+                                }).format(price)}{" "}
+                                each
                               </p>
                             </div>
 
                             <p className="shrink-0 text-right font-bold text-gray-800">
-                              {formatPrice(price * quantity)}
+                              {new Intl.NumberFormat("en-CM", {
+                                style: "currency",
+                                currency: "XAF",
+                                maximumFractionDigits: 0,
+                              }).format(price * quantity)}
                             </p>
                           </div>
                         );
                       })}
                     </div>
 
-                    {/* Order total */}
+                    {/* ORDER TOTAL */}
                     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 bg-gray-50 px-5 py-5 sm:px-6">
                       <p className="text-sm text-gray-500">
                         {items.reduce(
-                          (sum, item) => sum + getQuantity(item),
+                          (sum, item) =>
+                            sum + (Number(item.quantity) || 1),
                           0
                         )}{" "}
                         item(s) in this order
@@ -399,7 +344,19 @@ export default function Orders() {
                           Order total
                         </p>
                         <p className="mt-1 text-xl font-bold text-[#005078]">
-                          {formatPrice(getOrderTotal(order))}
+                          {new Intl.NumberFormat("en-CM", {
+                            style: "currency",
+                            currency: "XAF",
+                            maximumFractionDigits: 0,
+                          }).format(
+                            Number(
+                              order.totalAmount ??
+                                order.totalPrice ??
+                                order.total ??
+                                order.grandTotal ??
+                                0
+                            )
+                          )}
                         </p>
                       </div>
                     </div>
@@ -409,7 +366,7 @@ export default function Orders() {
             </div>
           )}
 
-          {/* Continue shopping */}
+          {/* CONTINUE SHOPPING */}
           {!loading && !error && orders.length > 0 && (
             <div className="mt-8 text-center">
               <Link

@@ -19,37 +19,59 @@ export default function Login() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        setLoading(true);
+   
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-        try {
-            const response = await api.post("/auth/login", form);
-            const data = response.data;
-             console.log("this is the user login data",data)
-            // Adjust this if your backend uses a different response shape.
-            if (!data.token) {
-                setError("Login succeeded, but the server did not return a token.");
-                return;
-            }
+    try {
+        const response = await api.post("/auth/login", form);
+        const data = response.data;
 
-            localStorage.setItem("token", data.token);
+        console.log("User login data:", data);
 
-            // if (data.user) {
-            //     localStorage.setItem("user", JSON.stringify(data.user));
-            // }
-
-            navigate("/");
-        } catch (err) {
+        // Ensure the backend returned a token.
+        if (!data.token) {
             setError(
-                err.response?.data?.message ||
-                "Login failed. Check your email and password."
+                "Login succeeded, but the server did not return a token."
             );
-        } finally {
-            setLoading(false);
+            return;
         }
-    };
+
+        // Save the authentication token.
+        localStorage.setItem("token", data.token);
+
+        // Get the logged-in user's role from the backend response.
+        const user = data.user;
+
+        if (!user || !user.role) {
+            setError(
+                "Login succeeded, but the server did not return the user's role."
+            );
+            localStorage.removeItem("token");
+            return;
+        }
+
+        // Save the user information for later use.
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // Redirect according to the user's role.
+        if (user.role === "admin") {
+            navigate("/admin", { replace: true });
+        } else {
+            navigate("/", { replace: true });
+        }
+
+    } catch (err) {
+        setError(
+            err.response?.data?.message ||
+            "Login failed. Check your email and password."
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <div className="min-h-screen bg-[#E0F3FC] px-4 py-10">

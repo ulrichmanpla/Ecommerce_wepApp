@@ -122,7 +122,23 @@ const getOrders = async (req,res)=>{
     res.status(500).json({message: err.message})
 }
 }
+
+
+const getAllOrder = async (req, res)=>{
+    try{
+      const data = await Order.find()
+      res.status(200).json({
+        message:"All orders",
+        totalOrders: data.length
+      })
+    }catch(err){
+      res.status(500).json({
+        message:err.message
+      })
+    }
+}
 module.exports = {
     createOrder,
-    getOrders
+    getOrders,
+    getAllOrder
 }
