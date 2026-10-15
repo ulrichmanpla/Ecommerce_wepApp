@@ -12,7 +12,8 @@ export default function Login() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
+    const [formError, setFormError]=useState("")
+    const [formError1, setFormError1]=useState("")
     const successMessage = location.state?.message;
 
     const handleChange = (e) => {
@@ -26,12 +27,18 @@ const handleSubmit = async (e) => {
     setLoading(true);
 
     try {
+        if(!form.email.trim()){
+          return  setFormError("email is required")
+            setError("")
+        }
+        if(!form.password.trim()){
+         return   setFormError1("password is required")
+            setError(" ")
+        }
         const response = await api.post("/auth/login", form);
         const data = response.data;
 
         console.log("User login data:", data);
-
-        // Ensure the backend returned a token.
         if (!data.token) {
             setError(
                 "Login succeeded, but the server did not return a token."
@@ -39,10 +46,10 @@ const handleSubmit = async (e) => {
             return;
         }
 
-        // Save the authentication token.
+
         localStorage.setItem("token", data.token);
 
-        // Get the logged-in user's role from the backend response.
+
         const user = data.user;
 
         if (!user || !user.role) {
@@ -53,10 +60,9 @@ const handleSubmit = async (e) => {
             return;
         }
 
-        // Save the user information for later use.
+
         localStorage.setItem("user", JSON.stringify(user));
 
-        // Redirect according to the user's role.
         if (user.role === "admin") {
             navigate("/admin", { replace: true });
         } else {
@@ -65,7 +71,7 @@ const handleSubmit = async (e) => {
 
     } catch (err) {
         setError(
-            err.response?.data?.message ||
+            err.data?.message ||
             "Login failed. Check your email and password."
         );
     } finally {
@@ -139,13 +145,17 @@ const handleSubmit = async (e) => {
                                         type="email"
                                         name="email"
                                         value={form.email}
-                                        onChange={handleChange}
+                                        onChange={(e) =>{handleChange(e)
+                                            setFormError("")
+                                             setError("")
+                                        }
+                                        }
                                         placeholder="you@example.com"
-                                        required
                                         autoComplete="email"
                                         className="w-full py-3 text-sm outline-none"
                                     />
                                 </div>
+                                <p className="text-red-500">{formError}</p>
                             </div>
 
                             <div>
@@ -158,12 +168,15 @@ const handleSubmit = async (e) => {
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={form.password}
-                                        onChange={handleChange}
+                                        onChange={(e)=>{handleChange(e)
+                                            setError("")
+                                            setFormError1("")
+                                        }}
                                         placeholder="Enter your password"
-                                        required
                                         autoComplete="current-password"
                                         className="w-full py-3 text-sm outline-none"
                                     />
+                                    
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
@@ -173,6 +186,7 @@ const handleSubmit = async (e) => {
                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
                                 </div>
+                                <p className="text-red-500">{formError1}</p>
                             </div>
 
                             <button

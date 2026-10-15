@@ -1,25 +1,23 @@
 
 
 import { useState,useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams,useNavigate } from "react-router-dom";
 import {
-    Heart,
     Star,
     Check,
     ShoppingCart,
-    Eye,
     Minus,
     Plus,
     ChevronRight,
 } from "lucide-react";
 
-
+import {addToCart} from '../services/cartService'
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import api from "../services/api";
 export default function ProductDetails() {
     const { id } = useParams();
-
+     const navigate = useNavigate()
      const [products, setProduct]=useState([])
 
      useEffect(()=>{
@@ -37,7 +35,6 @@ export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState("Reviews");
     const [selectedImage, setSelectedImage] = useState(null);
-    const [message, setMessage] = useState("");
 
     if (!product) {
         return (
@@ -70,15 +67,15 @@ export default function ProductDetails() {
         setQuantity((current) => Math.max(1, current + amount));
     };
 
-    const handleAddToCart = () => {
-        // Connect this handler to CartContext in the next step.
-        setMessage(`${quantity} × ${product.name} selected.`);
+    const handleAddToCart = async () => {
+        try{
+            await addToCart(id)
+            navigate("/cart")
+        }catch(err){
+            console.log(err.message)
+        }
     };
 
-    const handleBuyNow = () => {
-        // Checkout navigation can be connected when your cart flow is ready.
-        setMessage("Buy now selected. Checkout integration is the next step.");
-    };
 
     return (
         <div className="min-h-screen bg-white">
@@ -232,29 +229,12 @@ export default function ProductDetails() {
                                 Add to cart
                             </button>
 
-                            <button
-                                type="button"
-                                onClick={handleBuyNow}
-                                className="flex-1 rounded-full bg-[#F5A800] px-5 py-4 text-sm font-bold text-white transition hover:bg-[#d99000]"
-                            >
-                                Buy it now
-                            </button>
+                            
 
-                            <button
-                                type="button"
-                                aria-label="Add to wishlist"
-                                onClick={() => setMessage("Wishlist integration is coming next.")}
-                                className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:text-[#F5A800]"
-                            >
-                                <Heart size={22} />
-                            </button>
+                            
                         </div>
 
-                        {message && (
-                            <p role="status" className="mt-3 text-sm text-[#005078]">
-                                {message}
-                            </p>
-                        )}
+
 
                         <div className="my-5 border-t border-gray-200" />
 

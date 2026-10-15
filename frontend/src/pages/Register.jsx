@@ -15,6 +15,9 @@ export default function Register() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [formErro1, setFormError1]=useState("")
+    const [formErro2, setFormError2]=useState("")
+    const [formErro3, setFormError3]=useState("")
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,8 +27,16 @@ export default function Register() {
         e.preventDefault();
         setError("");
         setLoading(true);
-
         try {
+            if(!form.name.trim()){
+            return   setFormError1("name is required")
+            }
+            if(!form.email.trim()){
+              return  setFormError2("email is required")
+            }
+           if(!form.password.trim()){
+            return setFormError3("password is required")
+           }
             await api.post("/auth/register", form);
             navigate("/login", {
                 state: { message: "Account created successfully. Please log in." },
@@ -99,14 +110,16 @@ export default function Register() {
                                     <input
                                         name="name"
                                         value={form.name}
-                                        onChange={handleChange}
+                                        onChange={(e)=>{handleChange(e)
+                                            setFormError1("")
+                                        }}
                                         placeholder="Enter your full name"
-                                        required
                                         autoComplete="name"
                                         className="w-full py-3 text-sm outline-none"
                                     />
                                 </div>
                             </div>
+                                <p className="text-red-500">{formErro1}</p>
 
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-[#005078]">
@@ -118,13 +131,16 @@ export default function Register() {
                                         type="email"
                                         name="email"
                                         value={form.email}
-                                        onChange={handleChange}
+                                        onChange={(e)=>{handleChange(e)
+                                            setFormError2("")
+                                        }}
                                         placeholder="you@example.com"
-                                        required
                                         autoComplete="email"
                                         className="w-full py-3 text-sm outline-none"
                                     />
                                 </div>
+                                <p className="text-red-500">{formErro2}</p>
+                                
                             </div>
 
                             <div>
@@ -137,9 +153,10 @@ export default function Register() {
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={form.password}
-                                        onChange={handleChange}
+                                        onChange={(e)=>{handleChange(e)
+                                            setFormError3("")
+                                        }}
                                         placeholder="Create a password"
-                                        required
                                         minLength={6}
                                         autoComplete="new-password"
                                         className="w-full py-3 text-sm outline-none"
@@ -156,8 +173,9 @@ export default function Register() {
                                 <p className="mt-2 text-xs text-gray-400">
                                     Use at least 6 characters.
                                 </p>
+                                <p className="text-red-500">{formErro3}</p>
+                                
                             </div>
-
                             <button
                                 type="submit"
                                 disabled={loading}
