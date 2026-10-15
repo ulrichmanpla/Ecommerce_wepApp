@@ -12,7 +12,6 @@ export default function PromoBanner() {
                      <button className="bg-bg2 text-white rounded-full p-2 mb-5 ">New laptop</button>
                      <p className="text-cl1 font-bold text-[30px] ">Sale up to 50% off</p>
                      <p className="text-white text-xs mt-3 mb-5">12 inCh hd display</p>
-                     <button className="bg-bg2 text-white rounded-full p-2 mb-5 ">shop now</button>
                  </div>
             </div>
         </section>

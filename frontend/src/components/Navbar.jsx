@@ -1,81 +1,304 @@
-import logo1 from '../assets/logo1.png'
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import {getCart} from '../services/cartService'
-import {getUser} from '../services/user'
-import { useNavigate } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import logo1 from "../assets/logo1.png";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  UserRound,
+  ChevronDown,
+} from "lucide-react";
+
+import { getCart } from "../services/cartService";
+import { getUser } from "../services/user";
+
 export default function Navbar() {
-    const navigate = useNavigate()
- const [cartItems, setCart]= useState(null)
- const [isopen, setOpen]= useState(false)
- const [userinfo, setUserInfo]=useState(null)
- useEffect(()=>{
-    async function getICartItems() {
-        const data  = await getCart()
-       setCart(data)
+  const navigate = useNavigate();
+
+  const [cartItems, setCart] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+  const token = localStorage.getItem("token");
+  const cartQuantity = cartItems?.cart?.items?.reduce(
+    (total, item) => total + (Number(item.quantity) || 0),
+    0
+  ) || 0;
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCart() {
+      if (!token) {
+        setCart(null);
+        return;
+      }
+
+      try {
+        const data = await getCart();
+
+        if (active) {
+          setCart(data);
+        }
+      } catch (error) {
+        console.error("Unable to load cart:", error);
+      }
     }
-     getICartItems()
- },[])
-  useEffect(()=>{
-    async function getUsers() {
-        const data  = await getUser()
-        setUserInfo(data)
+
+    loadCart();
+
+    return () => {
+      active = false;
+    };
+  }, [token]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadUser() {
+      if (!token) {
+        setUserInfo(null);
+        return;
+      }
+
+      try {
+        const data = await getUser();
+
+        if (active) {
+          setUserInfo(data);
+        }
+      } catch (error) {
+        console.error("Unable to load user:", error);
+      }
     }
-     getUsers()
- },[])
-    const token = localStorage.getItem("token")
- const cartquantity = cartItems?.cart?.items.length
-   const handlelogout = ()=>{
-     localStorage.clear()
-     navigate('/')
-   }
-    return (
-        <header className='fixed top-0 w-full z-50'>
 
-            <div className="bg-[#005078] px-4 py-3">
+    loadUser();
 
-                <div className="mx-auto flex max-w-7xl items-center justify-between gap-5">
+    return () => {
+      active = false;
+    };
+  }, [token]);
 
-         
-                    <Link to='/' className="text-xl font-bold text-white">
-                       <img src={logo1} alt="logo1" />  
-                    </Link>
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
+    setUserInfo(null);
+    setCart(null);
+    setIsOpen(false);
+    setProfileOpen(false);
 
-                    <div className="flex items-center gap-4 text-sm text-white">
-                        <Link to='/' className='font-bold hover:text-bg2'>Home</Link>
-                        <Link to='/products' className='font-bold hover:text-bg2'>Products</Link>
-                        {!token ? isopen: <Link to='/orders' className='font-bold hover:text-bg2' >Orders</Link>  }
-                        <Link to='/register' className="btnnav">
-                             Sign in
-                        </Link>
+    navigate("/");
+  };
 
-                        <Link to='/login' className="btnnav">
-                            Login
-                        </Link>
+  const closeMenu = () => {
+    setIsOpen(false);
+    setProfileOpen(false);
+  };
 
-                        <Link to="/cart" className='flex gap-1 items-center'>
-                            <ShoppingCart size={30}/><span className='bg-amber-300 p-1 rounded-full h-5 w-5 text-center text-[9px]'>{cartquantity> 0 ? cartquantity: 0}</span> 
-                        </Link>
-                        {!token ? isopen: <div onClick={()=>{setOpen((prev)=> !prev)
-                         }}>
-                            <svg className='cursor-pointer' xmlns="http://www.w3.org/2000/svg" height="34px" viewBox="0 -960 960 960" width="34px" fill="#e3e3e3"><path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm146.5-204.5Q340-521 340-580t40.5-99.5Q421-720 480-720t99.5 40.5Q620-639 620-580t-40.5 99.5Q539-440 480-440t-99.5-40.5ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm100-95.5q47-15.5 86-44.5-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160q53 0 100-15.5ZM523-537q17-17 17-43t-17-43q-17-17-43-17t-43 17q-17 17-17 43t17 43q17 17 43 17t43-17Zm-43-43Zm0 360Z"/></svg>
-                         </div>}
-                         
-                    </div>
+  const navLinkClass =
+    "block rounded-lg px-3 py-2 font-semibold text-white transition hover:bg-white/10 hover:text-[#F5A800]";
 
-                </div>
+  return (
+    <header className="fixed top-0 z-50 w-full">
+      <nav className="bg-[#005078] px-4 py-3 shadow-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          {/* Logo */}
+          <Link to="/" onClick={closeMenu} className="shrink-0">
+            <img
+              src={logo1}
+              alt="Electon logo"
+              className="h-10 w-auto object-contain sm:h-12"
+            />
+          </Link>
 
-            </div>
-            
-            { isopen &&  <div className='bg-bg1 text-white w-fit p-3 absolute right-0 rounded-2xl'>
-                 <h3>{!userinfo ? "name" : `${userinfo.user.name}`}</h3>
-                 <h4>{!userinfo ? "email" :  `${userinfo.user.email}`}</h4>
-                 <div onClick={()=>{handlelogout();
-                    setOpen((prev)=> !prev)}} className='text-red-500 cursor-pointer'>Logout</div>
+  
+          <div className="hidden items-center gap-1 lg:flex">
+            <Link to="/" className={navLinkClass}>
+              Home
+            </Link>
+
+            <Link to="/products" className={navLinkClass}>
+              Products
+            </Link>
+
+            {token && (
+              <Link to="/orders" className={navLinkClass}>
+                Orders
+              </Link>
+            )}
+          </div>
+
+       
+          <div className="flex items-center gap-3">
+
+            <Link
+              to="/cart"
+              onClick={closeMenu}
+              aria-label={`Shopping cart, ${cartQuantity} items`}
+              className="relative flex items-center rounded-lg p-2 text-white transition hover:bg-white/10"
+            >
+              <ShoppingCart size={25} />
+
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F5A800] px-1 text-xs font-bold text-[#005078]">
+                {cartQuantity}
+              </span>
+            </Link>
+
+       
+            {!token ? (
+              <div className="hidden items-center gap-2 sm:flex">
+                <Link
+                  to="/register"
+                  className="rounded-lg border border-white px-4 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-[#005078]"
+                >
+                  Sign up
+                </Link>
+
+                <Link
+                  to="/login"
+                  className="rounded-lg bg-[#F5A800] px-4 py-2 text-sm font-bold text-[#005078] transition hover:bg-amber-400"
+                >
+                  Login
+                </Link>
               </div>
-           }
-        </header>
-    );
+            ) : (
+        
+              <div className="relative hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen((previous) => !previous)}
+                  aria-expanded={profileOpen}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-white hover:bg-white/10"
+                >
+                  <UserRound size={22} />
+                  <span className="max-w-28 truncate text-sm font-semibold">
+                    {userInfo?.user?.name || "My account"}
+                  </span>
+                  <ChevronDown size={16} />
+                </button>
+
+                {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white p-4 text-gray-800 shadow-xl">
+                    <p className="truncate font-bold">
+                      {userInfo?.user?.name || "My account"}
+                    </p>
+
+                    <p className="mt-1 break-all text-sm text-gray-500">
+                      {userInfo?.user?.email || ""}
+                    </p>
+
+                    {userInfo?.user?.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={closeMenu}
+                        className="mt-3 block rounded-lg px-3 py-2 font-semibold text-[#005078] hover:bg-[#E0F3FC]"
+                      >
+                        Admin dashboard
+                      </Link>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="mt-2 w-full rounded-lg px-3 py-2 text-left font-semibold text-red-600 hover:bg-red-50"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setIsOpen((previous) => !previous)}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              className="rounded-lg p-2 text-white hover:bg-white/10 lg:hidden"
+            >
+              {isOpen ? <X size={25} /> : <Menu size={25} />}
+            </button>
+          </div>
+        </div>
+
+       
+        {isOpen && (
+          <div className="mx-auto mt-3 max-w-7xl border-t border-white/20 pb-2 pt-3 lg:hidden">
+            <div className="flex flex-col gap-1">
+              <Link to="/" onClick={closeMenu} className={navLinkClass}>
+                Home
+              </Link>
+
+              <Link
+                to="/products"
+                onClick={closeMenu}
+                className={navLinkClass}
+              >
+                Products
+              </Link>
+
+              {token ? (
+                <>
+                  <Link
+                    to="/orders"
+                    onClick={closeMenu}
+                    className={navLinkClass}
+                  >
+                    Orders
+                  </Link>
+
+                  {userInfo?.user?.role === "admin" && (
+                    <Link
+                      to="/admin"
+                      onClick={closeMenu}
+                      className={navLinkClass}
+                    >
+                      Admin dashboard
+                    </Link>
+                  )}
+
+                  <div className="mx-3 my-2 rounded-lg bg-white/10 p-3 text-sm text-white">
+                    <p className="font-bold">
+                      {userInfo?.user?.name || "My account"}
+                    </p>
+                    <p className="mt-1 break-all text-blue-100">
+                      {userInfo?.user?.email || ""}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="rounded-lg px-3 py-2 text-left font-semibold text-amber-300 hover:bg-white/10"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 px-3 pt-2 sm:hidden">
+                  <Link
+                    to="/register"
+                    onClick={closeMenu}
+                    className="rounded-lg border border-white px-3 py-2 text-center font-semibold text-white"
+                  >
+                    Sign up
+                  </Link>
+
+                  <Link
+                    to="/login"
+                    onClick={closeMenu}
+                    className="rounded-lg bg-[#F5A800] px-3 py-2 text-center font-bold text-[#005078]"
+                  >
+                    Login
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </nav>
+    </header>
+  );
 }

@@ -64,7 +64,16 @@ export default function Hero() {
           setAdding(false);
       }
   };
+  const handleDetails = () => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+        setShowAuthModal(true);
+    } else {
+        
+        navigate(`/products/${product._id}`);
+    }
+};
   return (
       <section className="mx-auto max-w-7xl px-4 py-8 mt-6 relative">
           {error && (
@@ -73,7 +82,7 @@ export default function Hero() {
               </div>
           )}
 
-          <div className="relative flex min-h-82.5 items-center overflow-hidden rounded-2xl bg-gray-50 px-8 md:px-14">
+          <div className="relative flex  md:min-h-82.5 items-center overflow-hidden rounded-2xl bg-gray-50 px-8 md:px-14">
 
               <div className="z-10 max-w-sm">
                   <p className="mb-3 text-sm font-medium text-[#f5a800]">
@@ -92,9 +101,9 @@ export default function Hero() {
                       >
                           {isAdding ? "Adding..." : "Shop now"}
                       </button>
-                      <Link to="/products" className="rounded-lg border border-[#005078] px-6 py-3 text-sm font-semibold text-[#005078]">
+                      <button onClick={handleDetails}  className="rounded-lg border border-[#005078] px-6 py-3 text-sm font-semibold text-[#005078]">
                           View more
-                      </Link>
+                      </button>
                   </div>
               </div>
 

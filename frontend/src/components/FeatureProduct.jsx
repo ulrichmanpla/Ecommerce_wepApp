@@ -104,22 +104,7 @@ export default function FeaturedProducts() {
                                 ))}
                             </div>
 
-                            <div className="mt-5 flex gap-2">
-
-                                <button
-                                    className="flex items-center gap-2 rounded-lg bg-[#8fc5df] px-4 py-2 text-[10px] font-semibold text-[#005078] transition hover:bg-[#005078] hover:text-white"
-                                >
-                                    Add to cart
-                                    <ShoppingCart size={13} />
-                                </button>
-{/* 
-                                <button
-                                    className="flex h-9 w-10 items-center justify-center rounded-lg bg-[#8fc5df] text-[#005078] transition hover:bg-[#005078] hover:text-white"
-                                >
-                                    <Eye size={14} />
-                                </button> */}
-
-                            </div>
+                      
                         </div>
                     </div>
 

@@ -1,5 +1,4 @@
-import { Eye, ShoppingCart, Star, X } from "lucide-react"; // Ajout de l'icône X pour fermer le popup
-import { Link } from "react-router-dom";
+import { Eye, ShoppingCart, Star, X } from "lucide-react"; 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addToCart } from "../services/cartService";
@@ -8,8 +7,7 @@ export default function ProductCard({ product }) {
     const navigate = useNavigate();
     const [adding, setAdding] = useState(false);
     const [error, setError] = useState("");
-    
-    // Nouvel état pour gérer la visibilité du popup
+
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     const token = localStorage.getItem("token");
@@ -31,6 +29,16 @@ export default function ProductCard({ product }) {
             setAdding(false);
         }
     };
+  const handleDetails = () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        setShowAuthModal(true);
+    } else {
+        
+        navigate(`/products/${product._id}`);
+    }
+};
 
     return (
         <div className="relative">
@@ -90,13 +98,14 @@ export default function ProductCard({ product }) {
                             {adding ? "Adding..." : product.stock < 1 ? "Out of Stock" : "Add to Cart"}
                         </button>
                         
-                        <Link
+                        <button
+                          onClick={handleDetails}
                             to={`/products/${product._id}`}
                             aria-label={`View details for ${product.name}`}
                             className="flex h-9 w-10 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:border-[#005078] hover:text-[#005078]"
                         >
                             <Eye size={17} />
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -106,7 +115,7 @@ export default function ProductCard({ product }) {
                  
                     <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                         
-                        {/* Bouton de fermeture (X) */}
+                        
                         <button 
                             onClick={() => setShowAuthModal(false)}
                             className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition"

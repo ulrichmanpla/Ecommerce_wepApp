@@ -240,7 +240,7 @@ const handleDelete = async (product) => {
                 Back to dashboard
               </Link>
 
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 mt-8">
                 Product management
               </h1>
 
@@ -251,7 +251,7 @@ const handleDelete = async (product) => {
 
             <button
               onClick={openAddForm}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#005078] px-5 py-3 font-semibold text-white hover:bg-[#003e5d]"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#005078] px-5 py-3 font-semibold text-white hover:bg-[#003e5d mt-8"
             >
               <PackagePlus size={19} />
               Add product
